@@ -1,0 +1,20 @@
+.node {
+  padding: 1rem;
+  background-color: red;
+  max-width: 100px;
+  transform-origin: 0 0;
+  transform: none;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.canvas {
+  border: 1px solid #333;
+  width: 400px;
+  height: 400px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
