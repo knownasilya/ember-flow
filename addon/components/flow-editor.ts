@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { zoom, zoomIdentity } from 'd3-zoom';
 import { select, pointer } from 'd3-selection';
+import { drag } from 'd3-drag';
 import { action } from '@ember/object';
 import { throttle } from '@ember/runloop';
 
@@ -9,6 +10,7 @@ interface Args {}
 export default class FlowEditorComponent extends Component<Args> {
   @action
   setupZoom(element: HTMLDivElement) {
+    const d3DragInstance = drag();
     const d3ZoomInstance = zoom<HTMLDivElement, unknown>();
     const selection = select(element).call(d3ZoomInstance);
     const children = selection.selectChildren('div');
@@ -21,13 +23,24 @@ export default class FlowEditorComponent extends Component<Args> {
           [0, 0],
           [400, 400],
         ])
-        .scaleExtent([1, 8])
+        .scaleExtent([0, 8])
         .on('zoom', ({ transform }) => {
           throttle(() => {
             let { x, y, k } = transform;
             children.style('transform', `translate(${x}px,${y}px) scale(${k})`);
           }, 300);
         })
+    );
+
+    children.call(
+      d3DragInstance
+        .on('start', () => console.log('start'))
+        .on('drag', function (event: DragEvent) {
+          let selected = select(this);
+          selected.style('top', event.y + 'px');
+          selected.style('left', event.x + 'px');
+        })
+        .on('end', () => console.log('end'))
     );
 
     // later(() => d3ZoomInstance.scaleBy(selection, 2, [2, -2]), 1000);

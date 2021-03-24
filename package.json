@@ -28,12 +28,13 @@
     "postpack": "ember ts:clean"
   },
   "dependencies": {
+    "@ember/render-modifiers": "^1.0.2",
+    "d3-drag": "^2.0.0",
     "d3-selection": "^2.0.0",
     "d3-zoom": "^2.0.0",
     "ember-auto-import": "^1.10.1",
     "ember-cli-babel": "^7.23.1",
     "ember-cli-htmlbars": "^5.3.2",
-    "@ember/render-modifiers": "^1.0.2",
     "ember-cli-typescript": "^4.1.0"
   },
   "devDependencies": {
@@ -41,6 +42,7 @@
     "@ember/test-helpers": "^2.2.0",
     "@glimmer/component": "^1.0.3",
     "@glimmer/tracking": "^1.0.3",
+    "@types/d3-drag": "^2.0.0",
     "@types/d3-selection": "^2.0.0",
     "@types/d3-zoom": "^2.0.0",
     "@types/ember-qunit": "^3.4.13",
