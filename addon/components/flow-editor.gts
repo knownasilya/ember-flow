@@ -34,7 +34,7 @@ export default class FlowEditorComponent extends Component<Args> {
   hash = helper((_, hash) => hash);
   log = helper((value) => console.log(value));
 
-  static template = tpl`
+  <template>
     <div class='canvas' {{this.didInsert this.setupZoom}}>
       <div class='container'>
         {{yield (this.hash nodeClass='ember-flow__node' addEdge=this.addEdge)}}
@@ -54,7 +54,7 @@ export default class FlowEditorComponent extends Component<Args> {
         {{/each}}
       </svg>
     {{/if}}
-  `;
+  </template>
 
   get edges() {
     return Object.keys(this.edgeMap).map((key) => {
