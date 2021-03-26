@@ -1,12 +1,18 @@
 .node {
   padding: 1rem;
-  background-color: red;
   max-width: 100px;
   transform-origin: 0 0;
   transform: none;
   position: absolute;
   top: 20px;
   left: 20px;
+  border-radius: 6px;
+  border: 1px solid #999;
+  background-color: white;
+}
+
+.node:hover {
+  background-color: rgb(252, 252, 252);
 }
 
 .canvas {
@@ -17,4 +23,43 @@
   top: 0;
   left: 0;
   overflow: hidden;
+}
+
+.container {
+  transform-origin: 0 0;
+  transform: none;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.ember-flow__node {
+  cursor: grab;
+}
+
+.hello-node {
+  border-color: green;
+}
+
+.bye-node {
+  border-color: rebeccapurple;
+}
+
+.handle {
+  width: 6px;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background-color: gray;
+}
+
+.edge-bottom {
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+}
+
+.edge-left {
+  position: absolute;
+  left: -3px;
+  top: 50%;
 }

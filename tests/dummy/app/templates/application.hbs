@@ -1,8 +1,17 @@
 {{page-title 'Dummy'}}
 
-<FlowEditor>
-  <div class='node'>
+<FlowEditor as |api|>
+  <div class="hello-node node {{api.nodeClass}}">
     Hello
+    <div class='handle edge-bottom' {{api.addEdge 'a'}}></div>
+  </div>
+
+  <div
+    class="bye-node node {{api.nodeClass}}"
+    {{style top='150px' left='130px'}}
+  >
+    Good Bye
+    <div class='handle edge-left' {{api.addEdge 'a'}}></div>
   </div>
 </FlowEditor>
 
