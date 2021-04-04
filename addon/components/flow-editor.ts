@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { zoom, ZoomBehavior, zoomIdentity } from 'd3-zoom';
-import { select } from 'd3-selection';
+import { BaseType, select, Selection } from 'd3-selection';
 import { D3DragEvent, drag } from 'd3-drag';
 import { action } from '@ember/object';
 import { next, throttle } from '@ember/runloop';
@@ -41,6 +41,7 @@ export default class FlowEditorComponent extends Component<Args> {
   `;
 
   d3ZoomInstance?: ZoomBehavior<HTMLDivElement, unknown>;
+  selection?: Selection<HTMLDivElement, unknown, BaseType, unknown>;
 
   @tracked edgeMap: { [key: string]: Element[] } = {};
   addEdge = modifier((element, [id]: [string]) => {
@@ -140,10 +141,10 @@ export default class FlowEditorComponent extends Component<Args> {
 
   @action
   resetScale() {
-    debugger;
     const updatedTransform = zoomIdentity.scale(1);
-    // const children = [...element.children] as HTMLDivElement[];
 
-    this.d3ZoomInstance?.transform(this.selection, updatedTransform);
+    if (this.selection) {
+      this.d3ZoomInstance?.transform(this.selection, updatedTransform);
+    }
   }
 }
