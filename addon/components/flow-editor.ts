@@ -16,6 +16,29 @@ import { getArrow } from 'perfect-arrows';
 interface Args {}
 
 export default class FlowEditorComponent extends Component<Args> {
+  static template = tpl`
+    <div class='canvas' {{this.didInsert this.setupZoom}}>
+      <div class='container'>
+        {{yield (this.hash nodeClass='ember-flow__node' addEdge=this.addEdge)}}
+
+        {{#if this.edges}}
+          <svg
+            viewBox="0 0 400 400"
+            style="width: 400px; height: 400px"
+            stroke="#000"
+            fill="#000"
+            strokeWidth="3"
+          >
+            {{#each this.edges as |edge|}}
+              <path d={{edge.d}} fill="none" />
+            {{/each}}
+          </svg>
+        {{/if}}
+      </div>
+    </div>
+
+  `;
+
   d3ZoomInstance?: ZoomBehavior<HTMLDivElement, unknown>;
 
   @tracked edgeMap: { [key: string]: Element[] } = {};
@@ -34,28 +57,6 @@ export default class FlowEditorComponent extends Component<Args> {
   hash = helper((_, hash) => hash);
   log = helper((value) => console.log(value));
 
-  static template = tpl`
-    <div class='canvas' {{this.didInsert this.setupZoom}}>
-      <div class='container'>
-        {{yield (this.hash nodeClass='ember-flow__node' addEdge=this.addEdge)}}
-      </div>
-    </div>
-
-    {{#if this.edges}}
-      <svg
-        viewBox="0 0 400 400"
-        style="width: 400px; height: 400px"
-        stroke="#000"
-        fill="#000"
-        strokeWidth="3"
-      >
-        {{#each this.edges as |edge|}}
-          <path d={{edge.d}} fill="none" />
-        {{/each}}
-      </svg>
-    {{/if}}
-  `;
-
   get edges() {
     return Object.keys(this.edgeMap).map((key) => {
       let elements = this.edgeMap[key];
@@ -68,6 +69,8 @@ export default class FlowEditorComponent extends Component<Args> {
           p2.x - p2.width,
           p2.y - p2.height
         );
+        console.log(`${key} p1: ${p1.x}, ${p1.y}`);
+        console.log(`${key} p2: ${p2.x}, ${p2.y}`);
         const [sx, sy, cx, cy, ex, ey] = arrow;
 
         return {
