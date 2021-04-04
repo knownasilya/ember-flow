@@ -30,13 +30,14 @@ export default class FlowEditorComponent extends Component<Args> {
             strokeWidth="3"
           >
             {{#each this.edges as |edge|}}
-              <path d={{edge.d}} fill="none" />
+              <path d={{edge}} fill="none" />
             {{/each}}
           </svg>
         {{/if}}
       </div>
     </div>
 
+    <button onclick={{this.resetScale}}>Reset Zoom</button>
   `;
 
   d3ZoomInstance?: ZoomBehavior<HTMLDivElement, unknown>;
@@ -73,9 +74,7 @@ export default class FlowEditorComponent extends Component<Args> {
         console.log(`${key} p2: ${p2.x}, ${p2.y}`);
         const [sx, sy, cx, cy, ex, ey] = arrow;
 
-        return {
-          d: `M${sx},${sy} Q${cx},${cy} ${ex},${ey}`,
-        };
+        return `M${sx},${sy} Q${cx},${cy} ${ex},${ey}`;
       }
     });
   }
@@ -136,5 +135,15 @@ export default class FlowEditorComponent extends Component<Args> {
     );
 
     this.d3ZoomInstance = d3ZoomInstance;
+    this.selection = selection;
+  }
+
+  @action
+  resetScale() {
+    debugger;
+    const updatedTransform = zoomIdentity.scale(1);
+    // const children = [...element.children] as HTMLDivElement[];
+
+    this.d3ZoomInstance?.transform(this.selection, updatedTransform);
   }
 }

@@ -19,9 +19,6 @@
   border: 1px solid #333;
   width: 400px;
   height: 400px;
-  position: absolute;
-  top: 0;
-  left: 0;
   overflow: hidden;
 }
 
