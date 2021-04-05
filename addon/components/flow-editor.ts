@@ -30,7 +30,7 @@ export default class FlowEditorComponent extends Component<Args> {
             strokeWidth="3"
           >
             {{#each this.edges as |edge|}}
-              <path d={{edge}} fill="none" />
+              <path d={{edge.d}} fill="none" />
             {{/each}}
           </svg>
         {{/if}}
@@ -44,6 +44,8 @@ export default class FlowEditorComponent extends Component<Args> {
   selection?: Selection<HTMLDivElement, unknown, BaseType, unknown>;
 
   @tracked edgeMap: { [key: string]: Element[] } = {};
+  @tracked edges?: { d: string }[];
+
   addEdge = modifier((element, [id]: [string]) => {
     next(() => {
       if (this.edgeMap[id]) {
@@ -59,25 +61,35 @@ export default class FlowEditorComponent extends Component<Args> {
   hash = helper((_, hash) => hash);
   log = helper((value) => console.log(value));
 
-  get edges() {
-    return Object.keys(this.edgeMap).map((key) => {
-      let elements = this.edgeMap[key];
+  updateEdges() {
+    let edges = Object.keys(this.edgeMap)
+      .map((key) => {
+        let elements = this.edgeMap[key];
 
-      if (elements.length === 2) {
-        let [p1, p2] = elements.map((el) => el.getBoundingClientRect());
-        const arrow = getArrow(
-          p1.x - p1.width,
-          p1.y - p1.height,
-          p2.x - p2.width,
-          p2.y - p2.height
-        );
-        console.log(`${key} p1: ${p1.x}, ${p1.y}`);
-        console.log(`${key} p2: ${p2.x}, ${p2.y}`);
-        const [sx, sy, cx, cy, ex, ey] = arrow;
+        if (elements.length === 2) {
+          let [p1, p2] = elements.map((el) => el.getBoundingClientRect());
+          const arrow = getArrow(
+            p1.x - p1.width,
+            p1.y - p1.height,
+            p2.x - p2.width,
+            p2.y - p2.height
+          );
+          console.log(`${key} p1: ${p1.x}, ${p1.y}`);
+          console.log(`${key} p2: ${p2.x}, ${p2.y}`);
+          const [sx, sy, cx, cy, ex, ey] = arrow;
 
-        return `M${sx},${sy} Q${cx},${cy} ${ex},${ey}`;
-      }
-    });
+          return {
+            d: `M${sx},${sy} Q${cx},${cy} ${ex},${ey}`,
+          };
+        }
+
+        return;
+      })
+      .filter((i) => {
+        return i !== undefined;
+      });
+
+    this.edges = edges as { d: string }[];
   }
 
   @action
@@ -126,7 +138,7 @@ export default class FlowEditorComponent extends Component<Args> {
           selected.style('top', top + event.dy + 'px');
           selected.style('left', left + event.dx + 'px');
           // update the edge
-          this.edges;
+          this.updateEdges();
         })
         .on('end', function () {
           let selected = select(this);
@@ -137,6 +149,10 @@ export default class FlowEditorComponent extends Component<Args> {
 
     this.d3ZoomInstance = d3ZoomInstance;
     this.selection = selection;
+
+    next(() => {
+      this.updateEdges();
+    });
   }
 
   @action

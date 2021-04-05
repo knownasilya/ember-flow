@@ -11,7 +11,15 @@
     {{style top='150px' left='130px'}}
   >
     Good Bye
-    <div class='handle edge-left' {{api.addEdge 'a'}}></div>
+    <div class='handle edge-left' {{api.addEdge 'a'}} {{api.addEdge 'b'}}></div>
+  </div>
+
+  <div
+    class="bye-node node {{api.nodeClass}}"
+    {{style top='130px' left='250px'}}
+  >
+    Wave
+    <div class='handle edge-left' {{api.addEdge 'b'}}></div>
   </div>
 </FlowEditor>
 
