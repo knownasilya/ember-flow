@@ -1,19 +1,20 @@
-ember-flow
-==============================================================================
+# ember-flow
 
 :construction: Very early, things don't work as intended yet, plus not sure if declarative API will stay or not.
 
 A declarative component based API for building flow charts with nodes and edges.
 
+![Screenshot](./screenshot.png)
+
 ```hbs
 <FlowEditor as |api|>
-  <div class="hello-node node {{api.nodeClass}}">
+  <div class='hello-node node {{api.nodeClass}}'>
     Hello
     <div class='handle edge-bottom' {{api.addEdge 'a'}}></div>
   </div>
 
   <div
-    class="bye-node node {{api.nodeClass}}"
+    class='bye-node node {{api.nodeClass}}'
     {{style top='150px' left='130px'}}
   >
     Good Bye
@@ -21,7 +22,7 @@ A declarative component based API for building flow charts with nodes and edges.
   </div>
 
   <div
-    class="bye-node node {{api.nodeClass}}"
+    class='bye-node node {{api.nodeClass}}'
     {{style top='130px' left='250px'}}
   >
     Wave
@@ -30,35 +31,26 @@ A declarative component based API for building flow charts with nodes and edges.
 </FlowEditor>
 ```
 
-Compatibility
-------------------------------------------------------------------------------
+## Compatibility
 
-* Ember.js v3.16 or above
-* Ember CLI v2.13 or above
-* Node.js v10 or above
+- Ember.js v3.16 or above
+- Ember CLI v2.13 or above
+- Node.js v10 or above
 
-
-Installation
-------------------------------------------------------------------------------
+## Installation
 
 ```
 ember install ember-flow
 ```
 
-
-Usage
-------------------------------------------------------------------------------
+## Usage
 
 [Longer description of how to use the addon in apps.]
 
-
-Contributing
-------------------------------------------------------------------------------
+## Contributing
 
 See the [Contributing](CONTRIBUTING.md) guide for details.
 
-
-License
-------------------------------------------------------------------------------
+## License
 
 This project is licensed under the [MIT License](LICENSE.md).
