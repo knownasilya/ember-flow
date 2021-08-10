@@ -4,7 +4,7 @@
 
 A declarative component based API for building flow charts with nodes and edges.
 
-<img style="max-width: 300px;" src="./screenshot.png"/>
+<img style="width: 300px;" src="./screenshot.png"/>
 
 ```hbs
 <FlowEditor as |api|>
