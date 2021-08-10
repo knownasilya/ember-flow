@@ -22,7 +22,7 @@ A declarative component based API for building flow charts with nodes and edges.
   </div>
 
   <div
-    class='bye-node node {{api.nodeClass}}'
+    class='wav-node node {{api.nodeClass}}'
     {{style top='130px' left='250px'}}
   >
     Wave
