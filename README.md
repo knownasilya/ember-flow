@@ -32,7 +32,7 @@ A declarative component based API for building flow charts with nodes and edges.
   </api.Node>
 
   <api.Node
-    class="bye-node"
+    class="wave-node"
     {{style top='250px' left='50px'}}
   >
     <:default>
