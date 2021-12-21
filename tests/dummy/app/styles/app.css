@@ -60,3 +60,9 @@
   left: -3px;
   top: 50%;
 }
+
+.edge-top {
+  position: absolute;
+  top: -3px;
+  left: 50%;
+}
