@@ -8,6 +8,8 @@ A declarative component based API for building flow charts with nodes and edges.
 
 ```hbs
 <FlowEditor as |api|>
+  {{api.configureEdge 'a' label='Edge A'}}
+
   <api.Node class='hello-node'>
     <:default>
       Hello
@@ -15,6 +17,7 @@ A declarative component based API for building flow charts with nodes and edges.
 
     <:ports as |p|>
       <p.Port @position='bottom' {{p.connectEdge 'a'}}/>
+      <p.Port @position='right' {{p.connectEdge 'c'}} />
     </:ports>
   </api.Node>
 
@@ -32,7 +35,7 @@ A declarative component based API for building flow charts with nodes and edges.
   </api.Node>
 
   <api.Node
-    class="wave-node"
+    class="bye-node"
     {{style top='250px' left='50px'}}
   >
     <:default>
@@ -41,6 +44,7 @@ A declarative component based API for building flow charts with nodes and edges.
 
     <:ports as |p|>
       <p.Port @position='top' {{p.connectEdge 'b'}}/>
+      <p.Port @position='left' {{p.connectEdge 'c'}}/>
     </:ports>
   </api.Node>
 </FlowEditor>
