@@ -66,3 +66,9 @@
   top: -3px;
   left: 50%;
 }
+
+.edge-right {
+  position: absolute;
+  right: -3px;
+  top: 50%;
+}

@@ -8,6 +8,7 @@
 
     <:ports as |p|>
       <p.Port @position='bottom' {{p.connectEdge 'a'}}/>
+      <p.Port @position='right' {{p.connectEdge 'c'}} />
     </:ports>
   </api.Node>
 
@@ -34,6 +35,7 @@
 
     <:ports as |p|>
       <p.Port @position='top' {{p.connectEdge 'b'}}/>
+      <p.Port @position='left' {{p.connectEdge 'c'}}/>
     </:ports>
   </api.Node>
 </FlowEditor>

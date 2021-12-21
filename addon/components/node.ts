@@ -1,12 +1,17 @@
-import { helper } from '@ember/component/helper';
-import { next } from '@ember/runloop';
 import Component from '@glimmer/component';
+import { next } from '@ember/runloop';
 import { modifier } from 'ember-modifier';
+// @ts-ignore
 import { fn } from '@ember/helper';
-import didInsert from '@ember/render-modifiers/modifiers/did-insert';
+// @ts-ignore
+import { hash } from '@ember/helper';
 // @ts-ignore
 import { hbs as tpl } from 'ember-template-imports';
-import { EditorApi, Position } from './flow-editor';
+// @ts-ignore
+import didInsert from '@ember/render-modifiers/modifiers/did-insert';
+
+import { EditorApi } from './flow-editor';
+import { Position } from './smooth-step-edge';
 
 interface NodeArgs {
   editor: EditorApi;
@@ -22,7 +27,7 @@ export default class Node extends Component<NodeArgs> {
       </div>
 
       {{yield
-        (this.hash
+        (hash
           Port=(component this.Port register=this.register)
           connectEdge=this.connectEdge
         )
@@ -32,7 +37,6 @@ export default class Node extends Component<NodeArgs> {
   `;
 
   Port = Port;
-  hash = helper((_, hash) => hash);
   connectEdge = modifier((portEl, [id]: [string]) => {
     next(() => {
       this.args.editor.addEdgeToPort(portEl, id);
