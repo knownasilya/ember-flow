@@ -11,6 +11,7 @@ import { tracked } from '@glimmer/tracking';
 // @ts-ignore
 import didInsert from '@ember/render-modifiers/modifiers/did-insert';
 import { helper } from '@ember/component/helper';
+import Node from './node';
 
 interface Args {}
 
@@ -18,7 +19,7 @@ export default class FlowEditorComponent extends Component<Args> {
   static template = tpl`
     <div class='canvas' {{this.didInsert this.setupZoom}}>
       <div class='container'>
-        {{yield (this.hash nodeClass='ember-flow__node' addEdge=this.addEdge)}}
+        {{yield (this.hash Node=this.Node addEdge=this.addEdge)}}
 
         {{#if this.edges}}
           <svg
@@ -78,6 +79,7 @@ export default class FlowEditorComponent extends Component<Args> {
     }
   );
 
+  Node = Node;
   didInsert = didInsert;
   hash = helper((_, hash) => hash);
   log = helper((value) => console.log(value));

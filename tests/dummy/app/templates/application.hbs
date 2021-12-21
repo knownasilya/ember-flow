@@ -1,26 +1,26 @@
 {{page-title 'Dummy'}}
 
 <FlowEditor as |api|>
-  <div class="hello-node node {{api.nodeClass}}">
-    Hello
+  <api.Node class='hello-node'>
+      Hello
     <div class='handle edge-bottom' {{api.addEdge 'a' position='bottom'}}></div>
-  </div>
+  </api.Node>
 
-  <div
-    class="bye-node node {{api.nodeClass}}"
+  <Node
+    class="bye-node"
     {{style top='150px' left='130px'}}
   >
     Good Bye
     <div class='handle edge-left' {{api.addEdge 'a' position='left'}} {{api.addEdge 'b' position='left'}}></div>
-  </div>
+  </Node>
 
-  <div
-    class="bye-node node {{api.nodeClass}}"
-    {{style top='130px' left='250px'}}
+  <Node
+    class="bye-node"
+    {{style top='250px' left='50px'}}
   >
     Wave
     <div class='handle edge-top' {{api.addEdge 'b' position='top'}}></div>
-  </div>
+  </Node>
 </FlowEditor>
 
 {{outlet}}
