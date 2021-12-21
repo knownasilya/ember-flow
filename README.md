@@ -8,26 +8,41 @@ A declarative component based API for building flow charts with nodes and edges.
 
 ```hbs
 <FlowEditor as |api|>
-  <div class='hello-node node {{api.nodeClass}}'>
-    Hello
-    <div class='handle edge-bottom' {{api.addEdge 'a'}}></div>
-  </div>
+  <api.Node class='hello-node'>
+    <:default>
+      Hello
+    </:default>
 
-  <div
-    class='bye-node node {{api.nodeClass}}'
+    <:ports as |p|>
+      <p.Port @position='bottom' {{p.connectEdge 'a'}}/>
+    </:ports>
+  </api.Node>
+
+  <api.Node
+    class="bye-node"
     {{style top='150px' left='130px'}}
   >
-    Good Bye
-    <div class='handle edge-left' {{api.addEdge 'a'}} {{api.addEdge 'b'}}></div>
-  </div>
+    <:default>
+      Good Bye
+    </:default>
 
-  <div
-    class='wav-node node {{api.nodeClass}}'
-    {{style top='130px' left='250px'}}
+    <:ports as |p|>
+      <p.Port @position='left' {{p.connectEdge 'a'}} {{p.connectEdge 'b'}}/>
+    </:ports>
+  </api.Node>
+
+  <api.Node
+    class="bye-node"
+    {{style top='250px' left='50px'}}
   >
-    Wave
-    <div class='handle edge-left' {{api.addEdge 'b'}}></div>
-  </div>
+    <:default>
+      Wave
+    </:default>
+
+    <:ports as |p|>
+      <p.Port @position='top' {{p.connectEdge 'b'}}/>
+    </:ports>
+  </api.Node>
 </FlowEditor>
 ```
 
