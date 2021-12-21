@@ -4,17 +4,18 @@ import { BaseType, select, Selection } from 'd3-selection';
 import { D3DragEvent, drag } from 'd3-drag';
 import { action } from '@ember/object';
 import { next, throttle } from '@ember/runloop';
+import { helper } from '@ember/component/helper';
 import { TrackedMap, TrackedWeakMap } from 'tracked-built-ins';
-// @ts-ignore
+// @ts-expect-error imp
 import { hbs as tpl } from 'ember-template-imports';
-// @ts-ignore
+// @ts-expect-error imp
 import { tracked, cached } from '@glimmer/tracking';
-// @ts-ignore
+// @ts-expect-error imp
 import didInsert from '@ember/render-modifiers/modifiers/did-insert';
-// @ts-ignore
+// @ts-expect-error imp
 import { hash } from '@ember/helper';
 import Node from './node';
-// @ts-ignore
+// @ts-expect-error imp
 import SmoothStepEdge, { Position } from './smooth-step-edge';
 
 interface EdgeDef {
@@ -24,12 +25,20 @@ interface EdgeDef {
   sourceY: number;
   targetPosition?: Position;
   sourcePosition?: Position;
+  options?: EdgeOptions;
+}
+
+export interface EdgeOptions {
+  label?: string;
 }
 
 export class EditorApi {
   editor: FlowEditorComponent;
   ports = new TrackedWeakMap<Element, { position: Position }>();
-  edges = new TrackedMap<string, Element[]>();
+  edges = new TrackedMap<
+    string,
+    { ports?: Element[]; options?: EdgeOptions }
+  >();
 
   constructor(editor: FlowEditorComponent) {
     this.editor = editor;
@@ -37,10 +46,29 @@ export class EditorApi {
 
   addEdgeToPort(port: Element, edgeId: string) {
     if (this.edges.has(edgeId)) {
-      let ports = this.edges.get(edgeId);
-      ports?.push(port);
+      const data = this.edges.get(edgeId);
+
+      if (data && !data.ports) {
+        data.ports = [];
+      }
+
+      data?.ports?.push(port);
     } else {
-      this.edges.set(edgeId, [port]);
+      this.edges.set(edgeId, { ports: [port] });
+    }
+  }
+
+  configureEdge(id: string, options: EdgeOptions): void {
+    if (!this.edges.has(id)) {
+      this.edges.set(id, { options });
+    } else {
+      const data = this.edges.get(id);
+
+      if (!data) {
+        return;
+      }
+
+      data.options = options;
     }
   }
 
@@ -50,7 +78,7 @@ export class EditorApi {
 
   // @cached
   get edgeIds() {
-    let ids: string[] = [];
+    const ids: string[] = [];
 
     this.edges.forEach((_, id) => ids.push(id));
 
@@ -61,25 +89,26 @@ export class EditorApi {
   get edgeMap(): EdgeDef[] {
     return this.edgeIds
       .map((edgeId) => {
-        let ports = this.edges.get(edgeId);
-
-        if (!ports || ports.length !== 2) {
+        const data = this.edges.get(edgeId);
+        const ports = data && data.ports;
+        debugger;
+        if (!data || !ports || ports.length !== 2) {
           return;
         }
 
-        let source = ports[0];
-        let target = ports[1];
-        let sourceOptions = this.ports.get(source);
-        let targetOptions = this.ports.get(target);
+        const source = ports[0];
+        const target = ports[1];
+        const sourceOptions = this.ports.get(source);
+        const targetOptions = this.ports.get(target);
 
-        let [p1, p2] = [
+        const [p1, p2] = [
           source.getBoundingClientRect(),
           target.getBoundingClientRect(),
         ];
-        let sourceX = p1.x - p1.width;
-        let sourceY = p1.y - p1.height;
-        let targetX = p2.x - p2.width;
-        let targetY = p2.y - p2.height;
+        const sourceX = p1.x - p1.width;
+        const sourceY = p1.y - p1.height;
+        const targetX = p2.x - p2.width;
+        const targetY = p2.y - p2.height;
 
         return {
           targetX,
@@ -88,22 +117,21 @@ export class EditorApi {
           sourceY,
           targetPosition: targetOptions?.position,
           sourcePosition: sourceOptions?.position,
+          options: data.options,
         };
       })
       .filter((i) => !!i) as EdgeDef[];
   }
 }
 
-interface Args {}
-
-export default class FlowEditorComponent extends Component<Args> {
+export default class FlowEditorComponent extends Component {
   static template = tpl`
     <div class='canvas' {{didInsert this.setupZoom}}>
       <div class='container'>
         {{yield 
           (hash
             Node=(component this.Node editor=this.editorApi)
-            addEdge=this.addEdge
+            configureEdge=this.configureEdge
           )
         }}
 
@@ -123,6 +151,7 @@ export default class FlowEditorComponent extends Component<Args> {
                 @targetY={{edge.targetY}}
                 @targetPosition={{edge.targetPosition}}
                 @sourcePosition={{edge.sourcePosition}}
+                @options={{edge.options}}
               />
             {{/each}}
           </svg>
@@ -140,15 +169,20 @@ export default class FlowEditorComponent extends Component<Args> {
 
   editorApi = new EditorApi(this);
   Node = Node;
+  configureEdge = helper(([id]: [string], options: EdgeOptions) => {
+    next(() => {
+      this.editorApi.configureEdge(id, options);
+    });
+  });
 
-  updateEdges() {
-    let edges = this.editorApi.edgeMap;
+  updateEdges(): void {
+    const edges = this.editorApi.edgeMap;
 
     this.edges = edges;
   }
 
   @action
-  setupZoom(element: HTMLDivElement) {
+  setupZoom(element: HTMLDivElement): void {
     const d3DragInstance = drag<HTMLDivElement, unknown, unknown>();
     const d3ZoomInstance = zoom<HTMLDivElement, unknown>();
     const selection = select(element).call(d3ZoomInstance);
@@ -168,7 +202,7 @@ export default class FlowEditorComponent extends Component<Args> {
         .scaleExtent([0, 8])
         .on('zoom', ({ transform }) => {
           throttle(() => {
-            let { x, y, k } = transform;
+            const { x, y, k } = transform;
             container.style(
               'transform',
               `translate(${x}px,${y}px) scale(${k})`
@@ -180,15 +214,15 @@ export default class FlowEditorComponent extends Component<Args> {
     nodes.call(
       d3DragInstance
         .on('start', function () {
-          let selected = select(this);
+          const selected = select(this);
 
           selected.raise();
           selected.style('cursor', 'grabbing');
         })
         .on('drag', (event: D3DragEvent<HTMLDivElement, unknown, unknown>) => {
-          let selected = select(event.sourceEvent.target);
-          let top = Number(selected.style('top').replace('px', ''));
-          let left = Number(selected.style('left').replace('px', ''));
+          const selected = select(event.sourceEvent.target);
+          const top = Number(selected.style('top').replace('px', ''));
+          const left = Number(selected.style('left').replace('px', ''));
 
           selected.style('top', top + event.dy + 'px');
           selected.style('left', left + event.dx + 'px');
@@ -196,7 +230,7 @@ export default class FlowEditorComponent extends Component<Args> {
           this.updateEdges();
         })
         .on('end', function () {
-          let selected = select(this);
+          const selected = select(this);
 
           selected.style('cursor', 'grab');
         })
@@ -211,7 +245,7 @@ export default class FlowEditorComponent extends Component<Args> {
   }
 
   @action
-  resetScale() {
+  resetScale(): void {
     const updatedTransform = zoomIdentity.scale(1);
 
     if (this.selection) {

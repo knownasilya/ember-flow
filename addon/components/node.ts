@@ -1,13 +1,13 @@
 import Component from '@glimmer/component';
 import { next } from '@ember/runloop';
 import { modifier } from 'ember-modifier';
-// @ts-ignore
+// @ts-expect-error imp
 import { fn } from '@ember/helper';
-// @ts-ignore
+// @ts-expect-error imp
 import { hash } from '@ember/helper';
-// @ts-ignore
+// @ts-expect-error imp
 import { hbs as tpl } from 'ember-template-imports';
-// @ts-ignore
+// @ts-expect-error imp
 import didInsert from '@ember/render-modifiers/modifiers/did-insert';
 
 import { EditorApi } from './flow-editor';

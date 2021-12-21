@@ -1,13 +1,37 @@
 import Component from '@glimmer/component';
-// @ts-ignore
+import { tracked } from '@glimmer/tracking';
+// @ts-expect-error imp
 import { hbs as tpl } from 'ember-template-imports';
+// @ts-expect-error imp
+import didInsert from '@ember/render-modifiers/modifiers/did-insert';
+import { EdgeOptions } from './flow-editor';
+import { action } from '@ember/object';
 
 // TODO: use cached once bug fixed
+
+interface SmoothStepArgs {
+  sourceX: number;
+  sourceY: number;
+  targetX: number;
+  targetY: number;
+  sourcePosition?: Position;
+  targetPosition?: Position;
+  arrowHeadType?: ArrowHeadType;
+  markerEndId?: string;
+  borderRadius?: number;
+  options: EdgeOptions;
+}
+
 export default class SmoothStepEdge extends Component<SmoothStepArgs> {
   static template = tpl`
+    <g>
       <path style={{@style}} className="react-flow__edge-path" d={{this.path}} markerEnd={{this.markerEnd}} />
+      {{#if @options.label}}
+        <EdgeText @label={{@options.label}} @x={{this.labelPosition.x}} @y={{this.labelPosition.y}} />
+      {{/if}}
       {{yield}}
-    `;
+    </g>
+  `;
 
   get markerEnd() {
     return getMarkerEnd(this.args.arrowHeadType, this.args.markerEndId);
@@ -25,6 +49,56 @@ export default class SmoothStepEdge extends Component<SmoothStepArgs> {
     });
 
     return path;
+  }
+
+  get labelPosition(): { x: number; y: number } {
+    const [centerX, centerY] = getCenter({
+      sourceX: this.args.sourceX,
+      sourceY: this.args.sourceY,
+      targetX: this.args.targetX,
+      targetY: this.args.targetY,
+      sourcePosition: this.args.sourcePosition,
+      targetPosition: this.args.targetPosition,
+    });
+    return { x: centerX, y: centerY };
+  }
+}
+
+class EdgeTextBbox {
+  @tracked x = 0;
+  @tracked y = 0;
+  @tracked width = 0;
+  @tracked height = 0;
+}
+
+class EdgeText extends Component<{ x: number; y: number }> {
+  static template = tpl`
+    <g transform={{this.transform}} ...attributes>
+      <text class="ember-flow__edge-text" y={{this.y}} dy="0.3em" {{didInsert this.updateBbox}}>
+        {{@label}}
+      </text>
+      {{yield}}
+    </g>
+  `;
+
+  edgeTextBbox = new EdgeTextBbox();
+
+  get transform() {
+    return `translate(${this.args.x - this.edgeTextBbox.width / 2} ${
+      this.args.y - this.edgeTextBbox.height / 2
+    })`;
+  }
+
+  @action
+  updateBbox(el: SVGTextElement) {
+    const textBbox = el.getBBox();
+
+    Object.assign(this.edgeTextBbox, {
+      x: textBbox.x,
+      y: textBbox.y,
+      width: textBbox.width,
+      height: textBbox.height,
+    });
   }
 }
 
@@ -247,15 +321,3 @@ export const getCenter = ({
 
   return [centerX, centerY, xOffset, yOffset];
 };
-
-interface SmoothStepArgs {
-  sourceX: number;
-  sourceY: number;
-  targetX: number;
-  targetY: number;
-  sourcePosition?: Position;
-  targetPosition?: Position;
-  arrowHeadType?: ArrowHeadType;
-  markerEndId?: string;
-  borderRadius?: number;
-}

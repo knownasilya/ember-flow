@@ -1,6 +1,8 @@
 {{page-title 'Dummy'}}
 
 <FlowEditor as |api|>
+  {{api.configureEdge 'a' label='Edge A'}}
+  
   <api.Node class='hello-node'>
     <:default>
       Hello
