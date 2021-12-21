@@ -2,25 +2,40 @@
 
 <FlowEditor as |api|>
   <api.Node class='hello-node'>
+    <:default>
       Hello
-    <div class='handle edge-bottom' {{api.addEdge 'a' position='bottom'}}></div>
+    </:default>
+
+    <:ports as |p|>
+      <p.Port @position='bottom' {{p.connectEdge 'a'}}/>
+    </:ports>
   </api.Node>
 
-  <Node
+  <api.Node
     class="bye-node"
     {{style top='150px' left='130px'}}
   >
-    Good Bye
-    <div class='handle edge-left' {{api.addEdge 'a' position='left'}} {{api.addEdge 'b' position='left'}}></div>
-  </Node>
+    <:default>
+      Good Bye
+    </:default>
 
-  <Node
+    <:ports as |p|>
+      <p.Port @position='left' {{p.connectEdge 'a'}} {{p.connectEdge 'b'}}/>
+    </:ports>
+  </api.Node>
+
+  <api.Node
     class="bye-node"
     {{style top='250px' left='50px'}}
   >
-    Wave
-    <div class='handle edge-top' {{api.addEdge 'b' position='top'}}></div>
-  </Node>
+    <:default>
+      Wave
+    </:default>
+
+    <:ports as |p|>
+      <p.Port @position='top' {{p.connectEdge 'b'}}/>
+    </:ports>
+  </api.Node>
 </FlowEditor>
 
 {{outlet}}

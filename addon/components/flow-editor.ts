@@ -7,11 +7,81 @@ import { next, throttle } from '@ember/runloop';
 // @ts-ignore
 import { hbs as tpl } from 'ember-template-imports';
 import { modifier } from 'ember-modifier';
-import { tracked } from '@glimmer/tracking';
+// @ts-ignore
+import { tracked, cached } from '@glimmer/tracking';
 // @ts-ignore
 import didInsert from '@ember/render-modifiers/modifiers/did-insert';
 import { helper } from '@ember/component/helper';
 import Node from './node';
+import { TrackedMap, TrackedWeakMap } from 'tracked-built-ins';
+
+export class EditorApi {
+  editor: FlowEditorComponent;
+  ports = new TrackedWeakMap<Element, { position: Position }>();
+  edges = new TrackedMap<string, Element[]>();
+
+  constructor(editor: FlowEditorComponent) {
+    this.editor = editor;
+  }
+
+  addEdgeToPort(port: Element, edgeId: string) {
+    if (this.edges.has(edgeId)) {
+      let ports = this.edges.get(edgeId);
+      ports?.push(port);
+    } else {
+      this.edges.set(edgeId, [port]);
+    }
+  }
+
+  addPort(element: Element, position: Position) {
+    this.ports.set(element, { position });
+  }
+
+  // @cached
+  get edgeIds() {
+    let ids: string[] = [];
+
+    this.edges.forEach((_, id) => ids.push(id));
+
+    return ids;
+  }
+
+  // @cached
+  get edgeMap() {
+    return this.edgeIds
+      .map((edgeId) => {
+        let ports = this.edges.get(edgeId);
+
+        if (!ports || ports.length !== 2) {
+          return;
+        }
+
+        let source = ports[0];
+        let target = ports[1];
+        let sourceOptions = this.ports.get(source);
+        let targetOptions = this.ports.get(target);
+
+        let [p1, p2] = [
+          source.getBoundingClientRect(),
+          target.getBoundingClientRect(),
+        ];
+        let sourceX = p1.x - p1.width;
+        let sourceY = p1.y - p1.height;
+        let targetX = p2.x - p2.width;
+        let targetY = p2.y - p2.height;
+
+        return {
+          targetX,
+          targetY,
+          sourceX,
+          sourceY,
+          targetPosition: targetOptions?.position,
+          sourcePosition: sourceOptions?.position,
+        };
+      })
+      .filter((i) => i !== undefined);
+  }
+}
 
 interface Args {}
 
@@ -19,7 +89,12 @@ export default class FlowEditorComponent extends Component<Args> {
   static template = tpl`
     <div class='canvas' {{this.didInsert this.setupZoom}}>
       <div class='container'>
-        {{yield (this.hash Node=this.Node addEdge=this.addEdge)}}
+        {{yield 
+          (this.hash
+            Node=(component this.Node editor=this.editorApi)
+            addEdge=this.addEdge
+          )
+        }}
 
         {{#if this.edges}}
           <svg
@@ -63,6 +138,8 @@ export default class FlowEditorComponent extends Component<Args> {
     sourceY: number;
   }[];
 
+  editorApi = new EditorApi(this);
+
   addEdge = modifier(
     (element, [id]: [string], { position }: { position?: Position } = {}) => {
       next(() => {
@@ -85,35 +162,7 @@ export default class FlowEditorComponent extends Component<Args> {
   log = helper((value) => console.log(value));
 
   updateEdges() {
-    let edges = Object.keys(this.edgeMap)
-      .map((key) => {
-        let entry = this.edgeMap[key];
-
-        if (entry && entry.source && entry.target) {
-          let [p1, p2] = [
-            entry.source.element.getBoundingClientRect(),
-            entry.target.element.getBoundingClientRect(),
-          ];
-          let sourceX = p1.x - p1.width;
-          let sourceY = p1.y - p1.height;
-          let targetX = p2.x - p2.width;
-          let targetY = p2.y - p2.height;
-
-          return {
-            targetX,
-            targetY,
-            sourceX,
-            sourceY,
-            targetPosition: entry.target?.position,
-            sourcePosition: entry.source.position,
-          };
-        }
-
-        return;
-      })
-      .filter((i) => {
-        return i !== undefined;
-      });
+    let edges = this.editorApi.edgeMap;
 
     this.edges = edges as {
       targetX: number;
