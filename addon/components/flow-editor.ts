@@ -84,7 +84,7 @@ export class EditorApi {
     return ids;
   }
 
-  @cached
+  // @cached
   get edgeMap(): EdgeDef[] {
     return this.edgeIds
       .map((edgeId) => {
