@@ -8,7 +8,6 @@ import { helper } from '@ember/component/helper';
 import { TrackedMap, TrackedWeakMap } from 'tracked-built-ins';
 // @ts-expect-error imp
 import { hbs as tpl } from 'ember-template-imports';
-// @ts-expect-error imp
 import { tracked, cached } from '@glimmer/tracking';
 // @ts-expect-error imp
 import didInsert from '@ember/render-modifiers/modifiers/did-insert';
@@ -76,8 +75,8 @@ export class EditorApi {
     this.ports.set(element, { position });
   }
 
-  // @cached
-  get edgeIds() {
+  @cached
+  get edgeIds(): string[] {
     const ids: string[] = [];
 
     this.edges.forEach((_, id) => ids.push(id));
@@ -85,13 +84,13 @@ export class EditorApi {
     return ids;
   }
 
-  // @cached
+  @cached
   get edgeMap(): EdgeDef[] {
     return this.edgeIds
       .map((edgeId) => {
         const data = this.edges.get(edgeId);
         const ports = data && data.ports;
-        debugger;
+
         if (!data || !ports || ports.length !== 2) {
           return;
         }
